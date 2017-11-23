@@ -21,5 +21,8 @@
   "bugs": {
     "url": "https://github.com/Samuel-Potter-University-Portfolio/301CR-Web-API/issues"
   },
-  "homepage": "https://github.com/Samuel-Potter-University-Portfolio/301CR-Web-API#readme"
+  "homepage": "https://github.com/Samuel-Potter-University-Portfolio/301CR-Web-API#readme",
+  "dependencies": {
+    "express": "^4.16.2"
+  }
 }
