@@ -1,0 +1,25 @@
+{
+  "name": "bomberboy_api",
+  "version": "0.1.0",
+  "description": "A web API intended for usage with BomberBoy",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "rest",
+    "web",
+    "api",
+    "server"
+  ],
+  "author": "Sam 'DigitalQR' Potter",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Samuel-Potter-University-Portfolio/301CR-Web-API.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Samuel-Potter-University-Portfolio/301CR-Web-API/issues"
+  },
+  "homepage": "https://github.com/Samuel-Potter-University-Portfolio/301CR-Web-API#readme"
+}
