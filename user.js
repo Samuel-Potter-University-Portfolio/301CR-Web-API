@@ -49,7 +49,7 @@ exports.registerSchema = function(mongoose)
 				type: String,
 				required: true
 			},
-			creationData:
+			creationDate:
 			{
 				type: Date,
 				default: Date.now
@@ -67,7 +67,7 @@ exports.registerSchema = function(mongoose)
 */
 exports.registerEndpoints = function(apiPath, app)
 {
-	app.route(apiPath + '/User')
+	app.route(apiPath + '/User/:userId') // Defaults whatever comes after to be user id
 		.get(getUserData);
 		
 	app.route(apiPath + '/User/Register')
@@ -194,23 +194,37 @@ function registerNewUser(req, res)
 
 
 /**
-* Retreive user data
-* 	URI: GET <api>/User
+* Retreive globally avaliable user data by userId
+* 	URI: GET <api>/User/<userId>
 * @param {object} req		Http request object
 * @param {object} res		Http response object
 */
 function getUserData(req, res)
 {
-	res.writeHead(200,
+	// Check id
+	var userId = req.params.userId;
+	if(typeof userId !== 'string')
+	{
+		res.status(400).json({ message: 'Expected id to be given' });
+		return;
+	}
+	// Check id is correct format
+	if(/[^abcdef^0-9]/.test(userId))
+	{
+		res.status(400).json({ message: 'Expected id to be given in lowercase hex format' });
+		return;
+	}
+		
+	
+	UserEntry.findOne({ 'userId': userId }, 'displayName creationDate',
+		function(err, usr)
 		{
-			'Content-Type': 'text/plain'
+			if(err)
+				res.status(500).json({ message: 'Unable to query for user' });
+			else if(usr == null)
+				res.status(400).json({ message: 'Unable to find user of given id' });
+			else
+				res.status(200).json({ displayName: usr.displayName, creationDate: usr.creationDate });
 		}
 	);
-	
-	var obj = 
-	{
-		'Test': 0,
-		'Value': ['hellow', 'world']	
-	};
-	res.end('OK');//JSON.stringify(obj) + "\nNo: " + generateToken());
 };

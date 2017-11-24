@@ -20,20 +20,14 @@ exports.generateToken = function()
 exports.hashPassword = function(password, callback)
 {
 	var bcrypt = require('bcrypt'),
-		saltWork = 12;
+		salt = '$2a$13$3mqJi3em5xDdhVgnQ3x6g.';
 	
-	bcrypt.genSalt(saltWork,
-		function(err, salt)
+	
+	bcrypt.hash(password, salt, 
+		function(err, hash)
 		{
 			if(err) console.error(err);
-			
-			bcrypt.hash(password, salt, 
-				function(err, hash)
-				{
-					if(err) console.error(err);
-					callback(hash);
-				}
-			);
+			callback(hash.split('$')[3]);
 		}
 	);
 }
