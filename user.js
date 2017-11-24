@@ -109,79 +109,85 @@ function registerNewUser(req, res)
 	}
 	
 	
-	// Attempt to register new user
-	var newUser = new UserEntry(
+	Utils.hashPassword(req.body.password, 
+		function(hash)
 		{
-			userId: "token",//Utils.generateToken(),
-			email: req.body.email,
-			password: req.body.password,
-			displayName: req.body.displayName,
-		}
-	);
-	newUser.save(
-		function(err, usr)
-		{
-			if(err)
-			{
-				// Duplicate key
-				if(err.name == 'MongoError' && err.code == 11000)
-				{
-					// Work out which key is duplicated
-					var field = err.message.split('index: ')[1].split(' dup key:')[0];
 					
-					// Email already registered
-					if(field == 'email_1')
+			// Attempt to register new user
+			var newUser = new UserEntry(
+				{
+					userId: Utils.generateToken(),
+					email: req.body.email,
+					password: hash,
+					displayName: req.body.displayName,
+				}
+			);
+			newUser.save(
+				function(err, usr)
+				{
+					if(err)
 					{
-						res.status(409).json(
+						// Duplicate key
+						if(err.name == 'MongoError' && err.code == 11000)
+						{
+							// Work out which key is duplicated
+							var field = err.message.split('index: ')[1].split(' dup key:')[0];
+							
+							// Email already registered
+							if(field == 'email_1')
 							{
-								message: 'Account already registered using this email',
+								res.status(409).json(
+									{
+										message: 'Account already registered using this email',
+									}
+								)
 							}
-						)
-					}
-					// Account Id already used
-					else if(field == 'userId_1')
-					{
-						res.status(500).json(
+							// Account Id already used
+							else if(field == 'userId_1')
 							{
-								message: 'Error generating account ID',
+								res.status(500).json(
+									{
+										message: 'Error generating account ID',
+									}
+								)
+								// TODO - Generate new account id and just recall
 							}
-						)
-						// TODO - Generate new account id and just recall
+							else
+							{
+								res.status(400).json(
+									{
+										message: 'Uh Oh',
+									}
+								);
+								console.error(err);
+							}
+						}
+						
+						// Some other internal error
+						else 
+						{
+							res.status(500).json(
+								{
+									message: 'Request internally failed',
+								}
+							);
+							console.error(err);
+						}
+						
+						return;
 					}
 					else
 					{
-						res.status(400).json(
+						// Respond with user registered and userId
+						res.status(200).json(
 							{
-								message: 'Uh Oh',
+								message: 'User succesfully registered',
+								userId: usr.userId
 							}
 						);
-						console.error(err);
 					}
 				}
-				
-				// Some other internal error
-				else 
-				{
-					res.status(500).json(
-						{
-							message: 'Request internally failed',
-						}
-					);
-					console.error(err);
-				}
-				
-				return;
-			}
-			else
-			{
-				// Respond with user registered and userId
-				res.status(200).json(
-					{
-						message: 'User succesfully registered',
-						userId: usr.userId
-					}
-				);
-			}
+			);
 		}
 	);
 };
