@@ -1,9 +1,10 @@
 {
-  "name": "bomberboy_api",
+  "name": "bomberboyapi",
   "version": "0.1.0",
   "description": "A web API intended for usage with BomberBoy",
   "main": "index.js",
   "scripts": {
+	"start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -23,6 +24,7 @@
   },
   "homepage": "https://github.com/Samuel-Potter-University-Portfolio/301CR-Web-API#readme",
   "dependencies": {
-    "express": "^4.16.2"
+    "express": "^4.16.2",
+    "mongoose": "^4.13.4"
   }
 }
