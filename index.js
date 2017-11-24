@@ -51,14 +51,17 @@ function launchWebAPI()
 	//app.use(bodyParser.urlencoded({ extended: true }));
 	app.use(bodyParser.json());
 
+	
 	// Start server
 	app.listen(port);
 	console.log('API running on port ' + port);
 	
 	
+	// Setup frontend folder to server html
+	app.use('/', express.static(__dirname + '/frontend'));
+	
 	// List of all possible endpoints
 	var apiPath = '/BomberBoy/API/v1.0'; // How all endpoints past this point will start
-
 	user.registerEndpoints(apiPath, app);
 		
 		
