@@ -72,6 +72,9 @@ exports.registerEndpoints = function(apiPath, app)
 		
 	app.route(apiPath + '/User/Register')
 		.post(registerNewUser);
+		
+	app.route(apiPath + '/User/Update')
+		.post(updateUserData);
 };
 
 
@@ -110,8 +113,18 @@ function registerNewUser(req, res)
 	
 	
 	Utils.hashPassword(req.body.password, 
-		function(hash)
+		function(err, hash)
 		{
+			// Failed to generate password hash
+			if(err)
+			{
+				res.status(500).json(
+					{
+						message: 'Error processing user data',
+					}
+				)
+				return;
+			}
 					
 			// Attempt to register new user
 			var newUser = new UserEntry(
@@ -190,7 +203,7 @@ function registerNewUser(req, res)
 			);
 		}
 	);
-};
+}
 
 
 /**
@@ -227,4 +240,128 @@ function getUserData(req, res)
 				res.status(200).json({ displayName: usr.displayName, creationDate: usr.creationDate });
 		}
 	);
-};
+}
+
+/**
+* Update the given user's information using login information
+* 	URI: GET <api>/User/Update
+*	Can change:
+*		displayName (Needs to be called newDisplayName)
+*		password	(Needs to be called newPassword)
+* @param {object} req		Http request object
+* @param {object} res		Http response object
+*/
+function updateUserData(req, res)
+{
+	// Check body
+	if(typeof req.body !== 'object')
+	{
+		res.status(400).json({ message: 'Unable to parse JSON body' });
+		return;
+	}
+	
+	// Check required fields
+	if(typeof req.body.userId !== 'string')
+	{
+		res.status(400).json({ message: 'Missing \'userId\' string field' });
+		return;
+	}
+	if(typeof req.body.password !== 'string')
+	{
+		res.status(400).json({ message: 'Missing \'password\' string field' });
+		return;
+	}
+	
+	
+	// Send update to DB
+	var updateValues = {}
+	var pushUpdate = 
+		function()
+		{
+			Utils.hashPassword(req.body.password, 
+			function(err, hash)
+			{
+				// Failed to generate password hash
+				if(err)
+				{
+					res.status(500).json(
+						{
+							message: 'Error processing user data',
+						}
+					)
+					return;
+				}
+						
+				// Attempt to update user based on these details
+				UserEntry.findOneAndUpdate(
+					// Query
+					{
+						userId: req.body.userId,
+						password: hash
+					},
+					updateValues,
+					{ upsert: false }, // Don't create document, if not found
+					
+					function(err, doc)
+					{
+						if(err)
+						{
+							res.status(500).json({ message: 'Error when processing user data' });
+							return;
+						}
+						if(doc)
+							res.status(200).json({ message: 'Details updated' });
+						else
+							res.status(403).json({ message: 'Invalid login details' });
+					}
+				);
+		});
+	}
+	
+	
+	
+	// Store values we wish to update
+	var shouldUpdate = false;
+	if(req.body.newDisplayName != undefined)
+	{
+		if(typeof req.body.newDisplayName !== 'string')
+		{
+			res.status(400).json({ message: '\'newDisplayName\' is expected to be a string field' });
+			return;
+		}
+		
+		updateValues.displayName = req.body.newDisplayName;
+		shouldUpdate = true;
+	}
+	if(req.body.newPassword != undefined)
+	{
+		if(typeof req.body.newPassword !== 'string')
+		{
+			res.status(400).json({ message: '\'newPassword\' is expected to be a string field' });
+			return;
+		}
+		
+		// As must wait until hashed, handle call ourself
+		Utils.hashPassword(req.body.newPassword, 
+			function(err, hash)
+			{
+				// Failed to generate password hash
+				if(err)
+				{
+					res.status(400).json({ message: 'Error processing new desired password' });
+					return;
+				}
+				updateValues.password = hash;
+				pushUpdate();
+			}
+		);
+		return;		
+	}
+	
+	if(!shouldUpdate)
+		res.status(400).json({ message: 'No valid changes given' });
+	
+	// Get here if just updating displayName
+	else
+		pushUpdate();
+}

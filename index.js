@@ -3,19 +3,22 @@ var mongoose = require('mongoose');
 var user = require('./user.js');
 
 
-var promise = mongoose.connect('mongodb://localhost:27017/BomberBoy',
+mongoose.Promise = global.Promise;
+var connection = mongoose.connect('mongodb://localhost:27017/BomberBoy',
 {
 	useMongoClient: true//,	
 	//reconnectTries: 30
 });
 
-promise.then(
+connection.then(
 	function(db)
 	{
 		db.on('error', console.error.bind(console, 'connection error:'));
-		db.once('openURI', 
+		db.once('open', 
 			function()
 			{
+				// TODO - check (Doesn't call..?)
+				console.log("Mongo OPEN");
 			}
 		);
 		
@@ -64,7 +67,7 @@ function launchWebAPI()
 	app.use(
 		function(req, res)
 		{
-			res.status(404).send('Path "' + req.originalUrl + '"' + 'not found');
+			res.status(404).send('Path "' + req.originalUrl + '" not found');
 		}
 	);
 }
