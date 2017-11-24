@@ -1,7 +1,7 @@
 {
   "name": "bomberboyapi",
   "version": "0.1.0",
-  "description": "A web API intended for usage with BomberBoy",
+  "description": "A RESTful API intended for usage with BomberBoy",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
