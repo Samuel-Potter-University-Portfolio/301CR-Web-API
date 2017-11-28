@@ -91,6 +91,9 @@ exports.registerEndpoints = function(apiPath, app)
 		
 	app.route(apiPath + '/User/Login')
 		.post(loginUser);
+		
+	app.route(apiPath + '/User/Auth')
+		.post(validateUser);
 };
 
 
@@ -431,7 +434,7 @@ function loginUser(req, res)
 						return;
 					}
 					if(doc)
-						res.status(200).json({ session: desiredSession, doc: doc });
+						res.status(200).json({ userId: doc.userId, sessionId: desiredSession.sessionId });
 					else
 						res.status(403).json({ message: 'Invalid login details' });
 				}
@@ -439,4 +442,73 @@ function loginUser(req, res)
 			
 		}
 	);
+}
+
+/**
+* Check whether a particular session is valid
+* 	URI: POST <api>/User/Auth
+* @param {object} req		Http request object
+* @param {object} res		Http response object
+*/
+function validateUser(req, res)
+{
+	// Check body
+	if(typeof req.body !== 'object')
+	{
+		res.status(400).json({ message: 'Unable to parse JSON body' });
+		return;
+	}
+	
+	// Check required fields
+	if(typeof req.body.userId !== 'string')
+	{
+		res.status(400).json({ message: 'Missing \'userId\' string field' });
+		return;
+	}
+	if(typeof req.body.sessionId !== 'string')
+	{
+		res.status(400).json({ message: 'Missing \'sessionId\' string field' });
+		return;
+	}
+	
+	
+	var desiredSession = 
+			{
+					sessionId: Mongoose.Types.ObjectId(),
+					sessionStartTime: Date.now()					
+			}
+			
+		// Attempt to update user's session info, if login is correct
+		UserEntry.findOne(
+			// Query
+			{
+				userId: req.body.userId,
+				sessionId: req.body.sessionId
+			},
+			'sessionStartTime',
+			function(err, doc)
+			{
+				if(err)
+				{
+					res.status(500).json({ message: 'Error when processing user data', err: err });
+					return;
+				}
+				if(doc)
+				{
+					// Get the time difference between the session and now
+					var start = new Date();
+					var epochDiff = start.getTime() - doc.sessionStartTime.getTime()
+					var hour = 1000*60*60
+					var diff = Math.floor(epochDiff / hour);
+					
+					// If the session is more than 24 hours old, it is invalid
+					if(diff >= 24)
+						res.status(410).json( { message: 'Session has expired' } );
+					else
+						res.status(200).json( { message: 'Session is valid' } );
+				}
+				else
+					res.status(400).json({ message: 'No matching session found' });
+			}
+		)
 }
