@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Register Account</title>
+		<link rel="stylesheet" type="text/css" href="style.css">
+		<script type="text/javascript" src="Scripts/globals.js" charset="utf-8" defer></script>
+	<head/>
+	
+	<body>
+	<div class="pane">
+		<h1 class="title">User Registration</h1>
+		<table align="center">
+			<tr>
+				<td><label class="title">Email:</label></td>
+				<td><input id="emailInput" type="text" placeholder="Enter email address" name="email" required></td>
+			</tr>
+			<tr>
+				<td><label class="title">Display Name:</label></td>
+				<td><input id="nameInput" type="text" placeholder="Enter name" name="email" required></td>
+			</tr>
+			<tr><td><div/></td></tr>
+			<tr>
+				<td><label class="title">Password:</label></td>
+				<td><input id="pswrInput" type="password" placeholder="Enter password" name="pass" required></td>
+			</tr>
+			<tr>
+				<td><label class="title"></label></td>
+				<td><input id="pswrCheckInput" type="password" placeholder="Re-enter password" name="pass" required></td>
+			</tr>
+			<tr><td><div/></td></tr>
+			<tr>
+				<td><button id="register" type="submit">Register</button></td>
+				<td><p id="output" class="error" name="feedback"></p></td>
+			</tr>
+		</table>
+	</div>	
+	
+	<script type="text/javascript">
+	
+		var outputText = document.getElementById("output");
+		var registerButton = document.getElementById("register");
+		
+		var emailInput = document.getElementById("emailInput");
+		var nameInput = document.getElementById("nameInput");
+		
+		var pswrInput = document.getElementById("pswrInput");
+		var pswrCheckInput = document.getElementById("pswrCheckInput");
+	
+		registerButton.addEventListener("click", function()
+		{
+			// Check email format email
+			var regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+			if(!regex.test(emailInput.value))
+			{
+				outputText.style.color = 'red';
+				outputText.innerHTML = 'Invalid email format';
+				return;
+			}
+		
+			// Check name
+			if(nameInput.value.length < 3)
+			{
+				outputText.style.color = 'red';
+				outputText.innerHTML = 'Invalid display name length';
+				return;
+			}
+		
+			// Check password
+			if(pswrInput.value.length < 4)
+			{
+				outputText.style.color = 'red';
+				outputText.innerHTML = 'Invalid password length';
+				return;
+			}
+			
+			// Check password matches
+			if(pswrInput.value != pswrCheckInput.value)
+			{
+				outputText.style.color = 'red';
+				outputText.innerHTML = 'Passwords don\'t match';
+				return;
+			}
+			
+			
+			// Attempt to register account
+			registerButton.disabled = true;
+			{
+				var data = 
+				{
+					email: emailInput.value,
+					password: pswrInput.value,
+					displayName: nameInput.value
+				}
+				
+				var request = new XMLHttpRequest();
+				request.addEventListener("readystatechange", 
+				function()
+				{
+					if(this.readyState == 4)
+					{
+						// Account registered
+						if(this.status == 200)
+						{
+							outputText.style.color = 'green';
+							outputText.innerHTML = 'Account Registered';
+						}
+						
+						// There was some form of error
+						else
+						{
+							var response;
+							try
+							{
+								var response = JSON.parse(this.responseText);
+								if(typeof response == 'object')
+									response = response.message;
+							}
+							catch(e) 
+							{ 
+								if(e instanceof SyntaxError) 
+									response = 'An error has occurred';
+								else
+									throw e; 
+							}
+							
+							registerButton.disabled = false;
+							outputText.style.color = 'red';
+							outputText.innerHTML = response;
+						}
+					}
+				});
+				request.open("POST", apiURI + '/User/Register');
+				request.setRequestHeader('content-type', 'application/json');
+				request.setRequestHeader('cache-control', 'no-cache');
+				request.send(JSON.stringify(data));
+			}
+		});
+		
+	</script>
+		
+	</body>
+	
+</html>

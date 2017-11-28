@@ -80,7 +80,7 @@ exports.registerSchema = function(mongoose)
 */
 exports.registerEndpoints = function(apiPath, app)
 {
-	app.route(apiPath + '/User/:userId') // Defaults whatever comes after to be userId in params
+	app.route(apiPath + '/User/id/:userId') // Defaults whatever comes after to be userId in params
 		.get(getUserData);
 		
 	app.route(apiPath + '/User/Register')
@@ -215,7 +215,7 @@ function registerNewUser(req, res)
 
 /**
 * Retreive globally avaliable user data by userId
-* 	URI: GET <api>/User/<userId>
+* 	URI: GET <api>/User/id/<userId>
 * @param {object} req		Http request object
 * @param {object} res		Http response object
 */

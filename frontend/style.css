@@ -2,7 +2,61 @@ body {
 	background-color: lightblue;
 }
 
-h1 {
+h1.title
+{
 	color: navy;
-	margin-left: 20px;	
+	font-family: "Verdana", serif;
+    text-align: center;
+}
+
+p
+{
+	font-family: "Arial", serif;
+	font-size: 18px;
+}
+p.error
+{
+	font-family: "Arial", serif;
+	font-size: 18px;
+	color: red;
+}
+
+div
+{
+	padding: 8px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+div.pane
+{
+	background-color: white;
+	padding: 16px;
+	width: 800px;
+	height: 800px;
+    box-shadow: 10px 10px 10px #88888888;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+label
+{
+	font-family: "Arial", serif;
+	font-size: 18px;
+}
+
+button
+{
+	font-family: "Arial", serif;
+	font-size: 18px;
+	width: 100px;
+	height: 30px;
+}
+
+input
+{
+	font-family: "Arial", serif;
+	font-size: 18px;
+	width: 300px;
+	height: 25px;
 }
