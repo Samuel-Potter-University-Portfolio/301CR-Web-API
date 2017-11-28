@@ -1,5 +1,6 @@
 var Utils = require('./utils.js');
 
+var Mongoose = undefined;
 var UserEntry = undefined;
 
 
@@ -9,16 +10,20 @@ var UserEntry = undefined;
 */
 exports.registerSchema = function(mongoose)
 {
+	// For global access
+	Mongoose = mongoose;
+	
 	var UserSchema = mongoose.Schema(
 		{
 			userId:
 			{
-				type: String,
+				type: mongoose.Schema.ObjectId,
 				index : {
 					unique : true,
 					dropDups : true
 				},
-				required: 'Account must have a valid unqiue user id'
+				required: 'Account must have a valid unqiue user id',
+				default: Mongoose.Types.ObjectId
 			},
 			email:
 			{
@@ -53,6 +58,14 @@ exports.registerSchema = function(mongoose)
 			{
 				type: Date,
 				default: Date.now
+			},
+			sessionId: 
+			{
+				type: mongoose.Schema.ObjectId,
+			},
+			sessionStartTime:
+			{
+				type: Date	
 			}
 		}
 	);
@@ -67,7 +80,7 @@ exports.registerSchema = function(mongoose)
 */
 exports.registerEndpoints = function(apiPath, app)
 {
-	app.route(apiPath + '/User/:userId') // Defaults whatever comes after to be user id
+	app.route(apiPath + '/User/:userId') // Defaults whatever comes after to be userId in params
 		.get(getUserData);
 		
 	app.route(apiPath + '/User/Register')
@@ -75,6 +88,9 @@ exports.registerEndpoints = function(apiPath, app)
 		
 	app.route(apiPath + '/User/Update')
 		.post(updateUserData);
+		
+	app.route(apiPath + '/User/Login')
+		.post(loginUser);
 };
 
 
@@ -126,10 +142,9 @@ function registerNewUser(req, res)
 				return;
 			}
 					
-			// Attempt to register new user
+			// Attempt to register new user (Id will be auto generated)
 			var newUser = new UserEntry(
 				{
-					userId: Utils.generateToken(),
 					email: req.body.email,
 					password: hash,
 					displayName: req.body.displayName,
@@ -149,44 +164,33 @@ function registerNewUser(req, res)
 							// Email already registered
 							if(field == 'email_1')
 							{
-								res.status(409).json(
-									{
-										message: 'Account already registered using this email',
-									}
-								)
+								res.status(409).json({ message: 'Account already registered using this email' });
 							}
 							// Account Id already used
 							else if(field == 'userId_1')
 							{
-								res.status(500).json(
-									{
-										message: 'Error generating account ID',
-									}
-								)
+								res.status(500).json({ message: 'Error generating account ID' });
 								// TODO - Generate new account id and just recall
 							}
 							else
 							{
-								res.status(400).json(
-									{
-										message: 'Uh Oh',
-									}
-								);
+								res.status(400).json({ message: 'Unspecified request error' });
 								console.error(err);
 							}
+						}
+						
+						// Validation error
+						else if(err.name == 'ValidationError')
+						{
+							res.status(400).json({ message: err.message });
 						}
 						
 						// Some other internal error
 						else 
 						{
-							res.status(500).json(
-								{
-									message: 'Request internally failed',
-								}
-							);
-							console.error(err);
+							console.error(err.message);
+							res.status(500).json({ message: 'Request internally failed' });
 						}
-						
 						return;
 					}
 					else
@@ -244,7 +248,7 @@ function getUserData(req, res)
 
 /**
 * Update the given user's information using login information
-* 	URI: GET <api>/User/Update
+* 	URI: POST <api>/User/Update
 *	Can change:
 *		displayName (Needs to be called newDisplayName)
 *		password	(Needs to be called newPassword)
@@ -261,9 +265,9 @@ function updateUserData(req, res)
 	}
 	
 	// Check required fields
-	if(typeof req.body.userId !== 'string')
+	if(typeof req.body.email !== 'string')
 	{
-		res.status(400).json({ message: 'Missing \'userId\' string field' });
+		res.status(400).json({ message: 'Missing \'email\' string field' });
 		return;
 	}
 	if(typeof req.body.password !== 'string')
@@ -296,7 +300,7 @@ function updateUserData(req, res)
 				UserEntry.findOneAndUpdate(
 					// Query
 					{
-						userId: req.body.userId,
+						email: req.body.email,
 						password: hash
 					},
 					updateValues,
@@ -364,4 +368,75 @@ function updateUserData(req, res)
 	// Get here if just updating displayName
 	else
 		pushUpdate();
+}
+
+/**
+* Create a valid session for a given player login
+* 	URI: POST <api>/User/Login
+* @param {object} req		Http request object
+* @param {object} res		Http response object
+*/
+function loginUser(req, res)
+{
+	// Check body
+	if(typeof req.body !== 'object')
+	{
+		res.status(400).json({ message: 'Unable to parse JSON body' });
+		return;
+	}
+	
+	// Check required fields
+	if(typeof req.body.email !== 'string')
+	{
+		res.status(400).json({ message: 'Missing \'email\' string field' });
+		return;
+	}
+	if(typeof req.body.password !== 'string')
+	{
+		res.status(400).json({ message: 'Missing \'password\' string field' });
+		return;
+	}
+	
+	
+	Utils.hashPassword(req.body.password,
+		function(err, hash)
+		{
+			// Failed to generate password hash
+			if(err)
+			{
+				res.status(500).json({ message: 'Error processing user data' });
+				return;
+			}
+			
+			var desiredSession = 
+			{
+					sessionId: Mongoose.Types.ObjectId(),
+					sessionStartTime: Date.now()					
+			}
+			
+			// Attempt to update user's session info, if login is correct
+			UserEntry.findOneAndUpdate(
+				// Query
+				{
+					email: req.body.email,
+					password: hash
+				},
+				// Update 
+				desiredSession,
+				function(err, doc)
+				{
+					if(err)
+					{
+						res.status(500).json({ message: 'Error when processing user data' });
+						return;
+					}
+					if(doc)
+						res.status(200).json({ session: desiredSession, doc: doc });
+					else
+						res.status(403).json({ message: 'Invalid login details' });
+				}
+			);
+			
+		}
+	);
 }

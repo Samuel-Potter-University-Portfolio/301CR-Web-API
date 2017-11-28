@@ -57,7 +57,7 @@ function launchWebAPI()
 	console.log('API running on port ' + port);
 	
 	
-	// Setup frontend folder to server html
+	// Setup frontend folder to serve html
 	app.use('/', express.static(__dirname + '/frontend'));
 	
 	// List of all possible endpoints
