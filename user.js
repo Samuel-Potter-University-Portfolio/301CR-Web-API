@@ -17,13 +17,13 @@ exports.registerSchema = function(mongoose)
 		{
 			userId:
 			{
-				type: mongoose.Schema.ObjectId,
+				type: String,
 				index : {
 					unique : true,
 					dropDups : true
 				},
 				required: 'Account must have a valid unqiue user id',
-				default: Mongoose.Types.ObjectId
+				default: Utils.generateToken
 			},
 			email:
 			{
@@ -61,7 +61,7 @@ exports.registerSchema = function(mongoose)
 			},
 			sessionId: 
 			{
-				type: mongoose.Schema.ObjectId,
+				type: String,
 			},
 			sessionStartTime:
 			{
@@ -413,7 +413,7 @@ function loginUser(req, res)
 			
 			var desiredSession = 
 			{
-					sessionId: Mongoose.Types.ObjectId(),
+					sessionId: Utils.generateToken(),
 					sessionStartTime: Date.now()					
 			}
 			
@@ -434,7 +434,7 @@ function loginUser(req, res)
 						return;
 					}
 					if(doc)
-						res.status(200).json({ userId: doc.userId, sessionId: desiredSession.sessionId });
+						res.status(200).json({ displayName: doc.displayName, userId: doc.userId, sessionId: desiredSession.sessionId });
 					else
 						res.status(403).json({ message: 'Invalid login details' });
 				}
@@ -474,8 +474,8 @@ function validateUser(req, res)
 	
 	var desiredSession = 
 			{
-					sessionId: Mongoose.Types.ObjectId(),
-					sessionStartTime: Date.now()					
+				sessionId: Mongoose.Types.ObjectId(),
+				sessionStartTime: Date.now()					
 			}
 			
 		// Attempt to update user's session info, if login is correct
@@ -485,7 +485,7 @@ function validateUser(req, res)
 				userId: req.body.userId,
 				sessionId: req.body.sessionId
 			},
-			'sessionStartTime',
+			'sessionStartTime displayName',
 			function(err, doc)
 			{
 				if(err)
@@ -505,7 +505,7 @@ function validateUser(req, res)
 					if(diff >= 24)
 						res.status(410).json( { message: 'Session has expired' } );
 					else
-						res.status(200).json( { message: 'Session is valid' } );
+						res.status(200).json( { displayName: doc.displayName, message: 'Session is valid' } );
 				}
 				else
 					res.status(400).json({ message: 'No matching session found' });

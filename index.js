@@ -3,11 +3,15 @@ var mongoose = require('mongoose');
 var user = require('./user.js');
 
 
+///
+/// Setup DB
+///
 mongoose.Promise = global.Promise;
 var connection = mongoose.connect('mongodb://localhost:27017/BomberBoy',
 {
-	useMongoClient: true//,	
-	//reconnectTries: 30
+	useMongoClient: true,	
+	socketTimeoutMS: 20000,
+	reconnectTries: 30
 });
 
 connection.then(
@@ -29,7 +33,9 @@ connection.then(
 		user.registerSchema(mongoose);
 		
 		
+		//
 		// Only open Web API if connected to DB
+		//
 		launchWebAPI();
 	}
 );
