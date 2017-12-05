@@ -28,3 +28,14 @@
 	background-color: #222;
 	color:#FFF;
 }
+
+.lb-avatar-cell
+{
+	width: 60px;
+}
+
+.lb-avatar-img
+{
+	width: 60px;
+	image-rendering: pixelated;
+}
