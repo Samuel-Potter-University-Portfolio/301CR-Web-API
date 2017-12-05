@@ -1,6 +1,6 @@
 body 
 {
-	background-color: #E0E0E0;
+	background-color: #ecf0f1;
 }
 
 .header
@@ -34,6 +34,7 @@ body
 {	
 	border: 2px solid F8888;
 	padding: 10px;
+	margin-bottom: 10px;
 	background-color: #FFF;
 	width: 80vw;
 	box-shadow: 0px 4px 5px #8888;

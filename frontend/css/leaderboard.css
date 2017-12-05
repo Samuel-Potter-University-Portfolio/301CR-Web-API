@@ -1,0 +1,25 @@
+.stat 
+{
+	float: none;
+	margin:0 auto;
+	text-align:center;
+}
+
+
+.highlight 
+{
+	color:#222;
+	padding:10px 0;
+	font-weight:bold;
+	overflow:hidden;
+	margin-bottom:0;
+	font-size:72px;
+	display:block;
+}
+
+.stat-details 
+{
+	font-weight:bold;
+	font-size:18px;
+	color:#999;
+}

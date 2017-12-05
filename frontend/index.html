@@ -1,11 +1,88 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Index</title>
-		<link rel="stylesheet" type="text/css" href="style.css">
+		<title>Leaderboard</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		
+		
+		<link rel="stylesheet" type="text/css" href="./css/global.css">
+		<link rel="stylesheet" type="text/css" href="./css/leaderboard.css">
+		
+		<script type="text/javascript" src="./Scripts/globals.js" charset="utf-8" defer></script>
+		<script type="text/javascript" src="./Scripts/leaderboard.js" charset="utf-8" defer></script>
+		
 	<head/>
+	
 	<body>
-	<h1>This is a heading</h1>
-	<p>This is a paragraph.</p>
+	
+		<!-- Navigation bar -->
+		<nav class="navbar navbar-inverse global-navbar navbar-static-top" role="navigation">
+			<div class="container-fluid">
+				<div class="navbar-header">
+					<button type ="button" class="navbar-toggle" data-toggle="collapse" data-target="#global-nav">
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</button>
+					<a class="navbar-brand" href="./index.html">Bomber Boy</a>
+				</div>
+			
+				<div class="collapse navbar-collapse" id="global-nav">
+					<ul class="nav navbar-nav">
+						<li class="active"><a href="./index.html">Leader Board</a></li>
+					</ul>
+					<ul class="nav navbar-nav navbar-right">
+						<li><a href="./register.html"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+						<li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+					  </ul>
+				</div>
+			</div>
+		</nav>
+		
+		
+		<!-- General stats -->
+		<div class="container-fluid card">
+			<div class="stat">
+				<div class="col-lg-4">
+					<div class="milestone-counter">
+						<span class="stat-count highlight">100</span>
+						<div class="stat-details">Registered Users</div>
+					</div>
+				</div>
+				<div class="col-lg-4">
+					<div class="milestone-counter">
+						<span class="stat-count highlight">122</span>
+						<div class="stat-details">Matches played</div>
+					</div>
+				</div>
+				<div class="col-lg-4">
+					<div class="milestone-counter">
+						<span class="stat-count highlight">0</span>
+						<div class="stat-details">Some stat</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		
+		<!-- Querry settings -->
+		<div class="container card">
+			<p>TEMP</p>
+		</div>
+		
+		<!-- Leard board -->
+		<div class="container card">
+			<p>TEMP</p>
+		</div>
+		
+	<footer class="fixed-bottom footer">
+	<footer>
+		
 	</body>
+	
 </html>
