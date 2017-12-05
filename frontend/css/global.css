@@ -1,0 +1,40 @@
+body 
+{
+	background-color: #E0E0E0;
+}
+
+.header
+{
+	width: 100vw;
+	height: 100%;
+	margin-left: 0px;
+	margin-top: 0px;
+	padding: 10px;
+}
+
+.global-navbar
+{
+	background-color: #222;
+	color: #FFF;
+	box-shadow: 0px 4px 5px #8888;
+}
+   
+.footer
+{
+	background-color: #222;
+	position: fixed;
+    height: 100px;
+	bottom: 0;
+	width: 100vw;
+	box-shadow: 0px -4px 5px #8888;
+}
+
+
+.card
+{	
+	border: 2px solid F8888;
+	padding: 10px;
+	background-color: #FFF;
+	width: 80vw;
+	box-shadow: 0px 4px 5px #8888;
+}

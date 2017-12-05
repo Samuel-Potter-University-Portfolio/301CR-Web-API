@@ -71,6 +71,7 @@ exports.registerSchema = function(mongoose)
 	);
 	
 	UserEntry = mongoose.model('User', UserSchema);
+	
 };
 
 /**
