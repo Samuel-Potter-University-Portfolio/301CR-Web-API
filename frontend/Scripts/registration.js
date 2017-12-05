@@ -79,11 +79,19 @@ $("#register").click(function()
 			success: function(data, textStatus, jqXHR)
 			{
 				$("#register").css("background-color", goodColour);
+				$("#statusMsg").css("color", goodColour);
+				$("#statusMsg").text("Success!");
 			},
 			error: function(jqXHR, textStatus, error)
 			{
 				console.error("Error on request (" + textStatus + "): '" + error + "'");
 				$("#register").attr("disabled", false);	
+				
+				$("#statusMsg").css("color", badColour);
+				if(typeof jqXHR.responseJSON == 'object')
+					$("#statusMsg").text(jqXHR.responseJSON.message);
+				else
+					$("#statusMsg").text("An error occurred");
 			}
 		}
 		);
