@@ -61,23 +61,36 @@
 					</div>
 				</div>
 				<div class="col-lg-4">
-					<div class="milestone-counter">
-						<span class="stat-count highlight">0</span>
-						<div class="stat-details">Some stat</div>
-					</div>
 				</div>
 			</div>
 		</div>
 		
 		
-		<!-- Querry settings -->
-		<div class="container card">
-			<p>TEMP</p>
+		<!-- Query settings -->
+		<div class="container card lb-filters">
+			<p>TODO - Search/Filter settings</p>
 		</div>
 		
-		<!-- Leard board -->
+		<!-- Leader board -->
 		<div class="container card">
-			<p>TEMP</p>
+			<table class="table table-hover lb-table">
+				<thead>
+					<th>Place</th>
+					<th>Player</th>
+					<th>Score</th>
+					<th>Matches Played</th>
+					<th>Last Match</th>
+				</head>
+				<tbody id="lb-table-body">
+					<tr id="lb-entry-template" class="lb-entry">
+						<td id="place">1</td>
+						<td id="name">Player Name</td>
+						<td id="score">100</td>
+						<td id="matched-played">1</td>
+						<td id="last-match">1 day ago</td>
+					</tr>
+				</tbody>
+			</table>
 		</div>
 		
 	<footer class="fixed-bottom footer">
