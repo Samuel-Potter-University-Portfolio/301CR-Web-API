@@ -185,6 +185,13 @@ dataReadyCalls.push(function()
 	/// Start counter for each stat
 	$("#match-played-counter").text(apiData.matches.length);
 	$("#active-user-counter").text(Object.keys(rawPlayerData).length);
+	
+	// Count for all placed bombs
+	var bombsPlaced = 0
+	for(var userId in rawPlayerData)
+		bombsPlaced += rawPlayerData[userId].bombsPlaced;
+	$("#bomb-placed-counter").text(bombsPlaced);
+	
 	$(".stat-count").each(function()
 	{
 		var total = parseInt($(this).html(), 10);
