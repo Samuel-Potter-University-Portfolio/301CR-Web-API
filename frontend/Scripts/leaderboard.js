@@ -61,7 +61,24 @@ function AddLeaderboardEntry(entry)
 	
 	$row.find("#matched-played").text(entry.matchesPlayed);
 	
-	$row.find("#last-match").text(Date(entry.lastMatch));
+	// Display in xyz minutes/days/weeks ago
+	var timeSince = Date.now() - Date.parse(entry.lastMatch)
+	var asSeconds = Math.floor(timeSince / 1000);
+	var asMinutes = Math.floor(asSeconds / 60);
+	var asHours = Math.floor(asMinutes / 60);
+	var asDays = Math.floor(asHours / 24);
+	
+	if(asDays != 0)
+		$row.find("#last-match").text(asDays + " days ago");
+	else if(asHours != 0)
+		$row.find("#last-match").text(asHours + " hours ago");
+	else if(asMinutes != 0)
+		$row.find("#last-match").text(asMinutes + " minutes ago");
+	else
+		$row.find("#last-match").text(asSeconds + " seconds ago");
+	
+	
+	console.log(timeSince);
 
 	$("#lb-table-body").append($row);
 	$row.show();
@@ -119,7 +136,7 @@ function ExecuteLeaderboardQuery(matchValidator, playerValidator)
 					
 					rawPlayerData[userId].matchesPlayed++;
 					
-					if(rawPlayerData[userId].endTime < match.endTime)
+					if(rawPlayerData[userId].lastMatch < match.endTime)
 						rawPlayerData[userId].lastMatch = match.endTime;
 				}
 			}
