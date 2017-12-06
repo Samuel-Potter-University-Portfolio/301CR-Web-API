@@ -29,10 +29,16 @@
 	color:#FFF;
 }
 
+.lb-cell
+{
+    text-align:center; 
+    vertical-align:middle;
+}
 .lb-avatar-cell
 {
 	width: 60px;
 }
+
 
 .lb-avatar-img
 {

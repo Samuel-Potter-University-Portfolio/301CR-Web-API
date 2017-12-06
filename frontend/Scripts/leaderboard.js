@@ -77,8 +77,6 @@ function AddLeaderboardEntry(entry)
 	else
 		$row.find("#last-match").text(asSeconds + " seconds ago");
 	
-	
-	console.log(timeSince);
 
 	$("#lb-table-body").append($row);
 	$row.show();
