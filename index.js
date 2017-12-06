@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 
 var user = require('./user.js');
+var match = require('./match.js');
 
 
 ///
@@ -31,6 +32,7 @@ connection.then(
 		// Register all required schema
 		console.log("--Registering schema");
 		user.registerSchema(mongoose);
+		match.registerSchema(mongoose);
 		
 		
 		//
@@ -69,6 +71,7 @@ function launchWebAPI()
 	// List of all possible endpoints
 	var apiPath = '/BomberBoy/API/v1.0'; // How all endpoints past this point will start
 	user.registerEndpoints(apiPath, app);
+	match.registerEndpoints(apiPath, app);
 		
 		
 		

@@ -1,3 +1,4 @@
+exports.secretKey = "5c81377e82d3c32ff464fb3cbcf0ef77";
 
 /**
 * Generates a random token through sha256 
