@@ -44,6 +44,7 @@ exports.registerSchema = function(mongoose)
 					type: mongoose.Schema.Types.ObjectId, 
 					ref: 'User'
 				},
+				displayName: String, // The players display name whilst they were in this match
 				kills: Number,
 				deaths: Number,
 				roundsWon: Number,
@@ -64,7 +65,12 @@ exports.registerSchema = function(mongoose)
 exports.registerEndpoints = function(apiPath, app)
 {
 	app.route(apiPath + '/Match/Result')
-		.post(logMatchData);
+		.post(logMatchResult);
+		
+	app.route(apiPath + '/Match/Results')
+		.get(fetchMatchResults);
+	app.route(apiPath + '/Match/Results/:etag')
+		.get(fetchMatchResults);
 };
 
 
@@ -76,7 +82,7 @@ exports.registerEndpoints = function(apiPath, app)
 * @param {object} req		Http request object
 * @param {object} res		Http response object
 */
-function logMatchData(req, res)
+function logMatchResult(req, res)
 {
 	// Check for secret token
 	if(req.headers["api-token"] !== Utils.secretKey)
@@ -118,7 +124,7 @@ function logMatchData(req, res)
 		{
 			userId:{ $in: userIdLookup }
 		},
-		'_id_ userId',
+		'_id_ userId displayName',
 		function(err, docs)
 		{
 			if(err)
@@ -131,7 +137,11 @@ function logMatchData(req, res)
 			var idLookup = {};
 			docs.forEach(function(doc)
 			{
-				idLookup[doc.userId] = doc._id;
+				idLookup[doc.userId] = 
+				{
+					doc_id: doc._id,
+					name: doc.displayName
+				};
 			});
 			
 			
@@ -149,7 +159,8 @@ function logMatchData(req, res)
 				}
 			
 				newMatch.playerStats.push({
-					player: idLookup[player.userId],
+					player: idLookup[player.userId].doc_id,
+					displayName: idLookup[player.userId].name, 
 					kills: player.kills,
 					deaths: player.deaths,
 					roundsWon: player.roundsWon,
@@ -172,6 +183,70 @@ function logMatchData(req, res)
 					return;
 				}
 			);
+		}
+	);
+}
+
+
+/**
+* Fetch all match results
+* 	URI: GET <api>/Match/Results
+* @param {object} req		Http request object
+* @param {object} res		Http response object
+*/
+function fetchMatchResults(req, res)
+{
+	// If no time was given, get from start
+	var query = {}
+	if(req.params.etag != undefined)
+		query = 
+		{
+			endTime: { $gt: parseInt(req.params.etag) }
+		}
+	
+	var startTime = Date.now();
+	MatchEntry.find(
+		query,
+		function(err, docs)
+		{
+			if(err)
+			{
+				res.status(500).json({ message: 'Error processing the request', error:err.message });
+				return;
+			}
+			
+			// Formatted results
+			var matches = []
+			
+			docs.forEach(function(match)
+				{
+					var results = 
+					{
+						//matchId: match.matchId,
+						startTime: match.startTime,
+						endTime: match.endTime,
+						playerStats: {}
+					}
+					
+					// Put players as objects rather than an array
+					match.playerStats.forEach(function(stats)
+					{
+						results.playerStats[stats.player] = 
+						{
+							displayName: stats.displayName,
+							kills: stats.kills,
+							deaths: stats.deaths,
+							roundsWon: stats.roundsWon,
+							bombsPlaced: stats.bombsPlaced
+						}
+					});
+					matches.push(results);
+				}
+			);
+			
+			
+			res.status(200).json({ message: 'Matches fetched', etag: startTime, matches:matches });
+			return;
 		}
 	);
 }
