@@ -169,6 +169,8 @@ function ExecuteLeaderboardQuery(matchValidator, playerValidator)
 		stats.place = i + 1;
 		AddLeaderboardEntry(stats);
 	}
+	
+	return rawPlayerData;
 }
 
 
@@ -177,8 +179,12 @@ function ExecuteLeaderboardQuery(matchValidator, playerValidator)
 //
 dataReadyCalls.push(function()
 {	
+	// Update leaderboard using default query
+	var rawPlayerData = ExecuteLeaderboardQuery(function(match){ return true}, function(userId, stats){ return true });
+
 	/// Start counter for each stat
 	$("#match-played-counter").text(apiData.matches.length);
+	$("#active-user-counter").text(Object.keys(rawPlayerData).length);
 	$(".stat-count").each(function()
 	{
 		var total = parseInt($(this).html(), 10);
@@ -189,6 +195,4 @@ dataReadyCalls.push(function()
 		countStat($(this), 1000/total);
 	});
 
-	// Update leaderboard using default query
-	ExecuteLeaderboardQuery(function(match){ return true}, function(userId, stats){ return true });
 });
