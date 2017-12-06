@@ -1,1 +1,1 @@
-var apiURI = 'http://localhost/BomberBoy/API/v1.0';
+var apiURI = 'BomberBoy/API/v1.0';

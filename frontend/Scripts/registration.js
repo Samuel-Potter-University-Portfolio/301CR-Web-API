@@ -66,7 +66,7 @@ $("#register").click(function()
 		$.ajax(
 		{
 			type: "POST",
-			crossDomain: true,
+			crossDomain: false,
 			url: apiURI + "/User/Register",
 			contentType: "application/json",
 			data: JSON.stringify(

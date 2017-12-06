@@ -28,18 +28,6 @@ function countStat($this, sleepTime)
 }
 
 
-/// Start counter for each stat
-$(".stat-count").each(function()
-{
-	var total = parseInt($(this).html(), 10);
-	
-	// Take 1 second to reach target
-	$(this).data("total", total);
-	$(this).html('0');
-	countStat($(this), 2000/total);
-});
-
-
 
 // Hide the template from view
 $("#lb-entry-template").hide();
@@ -49,12 +37,9 @@ $("#lb-entry-template").hide();
 */
 function ClearLeaderboard()
 {
-	var template = $("#lb-entry-template");
-	$(".lb-entry").each(function()
+	$(".lb-entry-inst").each(function()
 	{
-		// Don't delete template
-		if($(this) != template)
-			$(this).remove();
+		$(this).remove();
 	});
 }
 
@@ -65,42 +50,128 @@ function ClearLeaderboard()
 function AddLeaderboardEntry(entry)
 {
 	var $row = $("#lb-entry-template").clone();
+	$row.attr("class", $row.attr("class") + " lb-entry-inst")
 	$row.find("#place").text(entry.place);
 	$row.find("#name").text(entry.name);
-	$row.find("#score").text(entry.score);
+	
+	$row.find("#rounds-won").text(entry.roundsWon);
+	$row.find("#kills").text(entry.kills);
+	$row.find("#deaths").text(entry.deaths);
+	$row.find("#bombs-placed").text(entry.bombsPlaced);
+	
 	$row.find("#matched-played").text(entry.matchesPlayed);
-	$row.find("#last-match").text(entry.lastMatch);
+	
+	$row.find("#last-match").text(Date(entry.lastMatch));
 
 	$("#lb-table-body").append($row);
 	$row.show();
 }
+
 /**
-* Add multiple leaderboard entries
-* @param {object:array} entries			An array of all the entries to add
+* Update the leaderboard with a given query
+* @param {function(match object)} 		matchValidator			Callback (True/False) is this match valid for this querry
+* @param {function{userId statsObject}} playerValidator			Callback (True/False) is this player data valid for this querry
 */
-function AddLeaderboardEntries(entries)
+function ExecuteLeaderboardQuery(matchValidator, playerValidator)
 {
-	entries.forEach(function(entry)
+	// Fetch the raw player data
+	var rawPlayerData = {};	
+	
+	apiData.matches.forEach(function(match)
 	{
-		AddLeaderboardEntry(entry);
+		// Only add match if it's valid for the query
+		if(matchValidator(match))
+		{
+		
+			// Add players if they are valid for the query
+			for(var userId in match.playerStats)
+			{
+				var stats = match.playerStats[userId];
+				if(!matchValidator(userId, stats))
+					continue;
+				
+				// Format the data into leaderboard format
+				if(!rawPlayerData.hasOwnProperty(userId))
+				{
+					// Create new entry
+					rawPlayerData[userId] = 
+					{
+						name: stats.displayName,
+						
+						roundsWon: stats.roundsWon,
+						kills: stats.kills,
+						deaths: stats.deaths,
+						bombsPlaced: stats.bombsPlaced,
+						
+						matchesPlayed: 1,
+						lastMatch: match.endTime
+					}
+				}
+				else
+				{
+					// Update existing entry
+					rawPlayerData[userId].name = stats.displayName; // Use most recent display name
+					
+					rawPlayerData[userId].roundsWon += stats.roundsWon;
+					rawPlayerData[userId].kills += stats.kills;
+					rawPlayerData[userId].deaths += stats.deaths;
+					rawPlayerData[userId].bombsPlaced += stats.bombsPlaced
+					
+					rawPlayerData[userId].matchesPlayed++;
+					
+					if(rawPlayerData[userId].endTime < match.endTime)
+						rawPlayerData[userId].lastMatch = match.endTime;
+				}
+			}
+		}
 	});
+	
+	// Sort players by rounds won
+	var sortedPlayerData = [];
+	
+	for(var userId in rawPlayerData)
+	{
+		var stats = rawPlayerData[userId];
+		
+		// Find position to data put at
+		for(var i = 0; i<sortedPlayerData.length; ++i)
+		{
+			if(stats.roundsWon > sortedPlayerData[i].roundsWon)
+				break;
+		}
+		
+		sortedPlayerData.splice(i, 0, stats);
+	}
+	
+	
+	// Add all entries to table
+	ClearLeaderboard();
+	for(var i = 0; i<sortedPlayerData.length; ++i)
+	{
+		var stats = sortedPlayerData[i];
+		stats.place = i + 1;
+		AddLeaderboardEntry(stats);
+	}
 }
 
-AddLeaderboardEntries(
-[
+
+//
+// Add callback so when data is fetched from api, tables will be updated
+//
+dataReadyCalls.push(function()
+{	
+	/// Start counter for each stat
+	$("#match-played-counter").text(apiData.matches.length);
+	$(".stat-count").each(function()
 	{
-		place: 1,
-		name: "Test Guy",
-		score: 100,
-		matchesPlayed: 15,
-		lastMatch: "1 day ago"	
-	},
-	{
-		place: 1,
-		name: "Test Guy",
-		score: 100,
-		matchesPlayed: 15,
-		lastMatch: "1 day ago"	
-	}
-]
-);
+		var total = parseInt($(this).html(), 10);
+		
+		// Take 1 second to reach target
+		$(this).data("total", total);
+		$(this).html('0');
+		countStat($(this), 1000/total);
+	});
+
+	// Update leaderboard using default query
+	ExecuteLeaderboardQuery(function(match){ return true}, function(userId, stats){ return true });
+});
