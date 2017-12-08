@@ -49,7 +49,7 @@ connection.then(
 function launchWebAPI()
 {
 	console.log('Launching API');
-	var port = 80;
+	var port = process.env.PORT || 80;
 
 	var express = require('express'),
 		app = express();
