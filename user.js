@@ -149,7 +149,7 @@ function registerNewUser(req, res)
 			// Attempt to register new user (Id will be auto generated)
 			var newUser = new UserEntry(
 				{
-					email: req.body.email,
+					email: req.body.email.toUpperCase(),
 					password: hash,
 					displayName: req.body.displayName,
 				}
@@ -304,7 +304,7 @@ function updateUserData(req, res)
 				UserEntry.findOneAndUpdate(
 					// Query
 					{
-						email: req.body.email,
+						email: req.body.email.toUpperCase(),
 						password: hash
 					},
 					updateValues,
@@ -422,7 +422,7 @@ function loginUser(req, res)
 			UserEntry.findOneAndUpdate(
 				// Query
 				{
-					email: req.body.email,
+					email: req.body.email.toUpperCase(),
 					password: hash
 				},
 				// Update 

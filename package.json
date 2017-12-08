@@ -24,9 +24,10 @@
   },
   "homepage": "https://github.com/Samuel-Potter-University-Portfolio/301CR-Web-API#readme",
   "dependencies": {
+    "babel-cli": "^6.26.0",
     "bcrypt": "^1.0.3",
     "express": "^4.16.2",
     "mongoose": "^4.13.4",
-	"nodemon": "^1.12.1"
+    "nodemon": "^1.12.1"
   }
 }

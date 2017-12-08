@@ -118,6 +118,13 @@ function logMatchResult(req, res)
 		userIdLookup.push(player.userId);
 	});
 	
+	if(userIdLookup.length == 0)
+	{
+		res.status(400).json({ message: '\'playerStats\' array field is empty' });
+		return;
+	}
+	
+	
 	// Fetch user object ids (to use as foriegn keys)
 	Mongoose.model('User').find(
 		// Query
@@ -150,14 +157,15 @@ function logMatchResult(req, res)
 			var newMatch = new MatchEntry();
 			newMatch.startTime = new Date(req.body.startTime);
 			
+			var failedUser = undefined;
 			req.body.playerStats.forEach(function(player)
 			{
 				if(idLookup[player.userId] == undefined)
 				{
-					res.status(400).json({ message: 'Invalid user id \'' + player.userId + '\' given' });save
+					failedUser = player.userId;
 					return;
 				}
-			
+				
 				newMatch.playerStats.push({
 					player: idLookup[player.userId].doc_id,
 					displayName: idLookup[player.userId].name, 
@@ -167,6 +175,12 @@ function logMatchResult(req, res)
 					bombsPlaced: player.bombsPlaced,
 				});
 			});
+			if(failedUser)
+			{
+				res.status(400).json({ message: 'Invalid user id \'' + failedUser + '\' given' });
+				return;
+			}
+			
 			
 			// Attempt to save new match info
 			newMatch.save(

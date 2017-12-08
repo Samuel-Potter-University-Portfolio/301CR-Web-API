@@ -23,7 +23,7 @@ body
 {
 	background-color: #222;
 	position: fixed;
-    height: 100px;
+    height: 50px;
 	bottom: 0;
 	width: 100vw;
 	box-shadow: 0px -4px 5px #8888;
@@ -37,5 +37,5 @@ body
 	margin-bottom: 10px;
 	background-color: #FFF;
 	width: 80vw;
-	box-shadow: 0px 4px 5px #8888;
+	box-shadow: 0px 5px 4px #8888;
 }
