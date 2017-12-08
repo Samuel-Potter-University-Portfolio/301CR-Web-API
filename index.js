@@ -3,18 +3,46 @@ var mongoose = require('mongoose');
 var user = require('./user.js');
 var match = require('./match.js');
 
+///
+/// Setup logging to a file
+///
+var fs = require('fs');
+var logFile = fs.createWriteStream(__dirname + '/node.log', { flags: 'w'});
+
+var GetTimeStamp = function()
+{	
+	var d = new Date();
+	return d.getFullYear() + '/' + d.getMonth() + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+}
+var stdout = process.stdout;
+var stderr = process.stderr;
+console.log = function(msg)
+{
+	var stamp = '[' + GetTimeStamp() + ']: ';
+	logFile.write(stamp + msg + '\n');
+	stdout.write(stamp + msg + '\n');
+};
+console.error = function(msg)
+{
+	var stamp = '[' + GetTimeStamp() + '][ERROR]: ';
+	logFile.write(stamp + msg + '\n');
+	stderr.write(stamp + msg + '\n');
+};
+
 
 ///
 /// Setup DB
 ///
 mongoose.Promise = global.Promise;
-var connection = mongoose.connect(process.env.DB ||'mongodb://localhost:27017/BomberBoy'),
+var connection = mongoose.connect((process.env.DB || 'mongodb://localhost:27017/BomberBoy'),
 {
 	useMongoClient: true,	
 	socketTimeoutMS: 20000,
 	reconnectTries: 30
 });
 
+console.log('Attempting to connect to db');
+console.error('2323');
 connection.then(
 	function(db)
 	{
