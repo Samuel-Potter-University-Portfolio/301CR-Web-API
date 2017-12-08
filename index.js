@@ -34,15 +34,15 @@ console.error = function(msg)
 /// Setup DB
 ///
 mongoose.Promise = global.Promise;
-var connection = mongoose.connect((process.env.DB || 'mongodb://localhost:27017/BomberBoy'),
+var dbAddr = (process.env.DB || 'mongodb://localhost:27017/BomberBoy');
+var connection = mongoose.connect(dbAddr,
 {
 	useMongoClient: true,	
 	socketTimeoutMS: 20000,
 	reconnectTries: 30
 });
 
-console.log('Attempting to connect to db');
-console.error('2323');
+console.log('Attempting to connect to db at \'' + dbAddr + '\'');
 connection.then(
 	function(db)
 	{
