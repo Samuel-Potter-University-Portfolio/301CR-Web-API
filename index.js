@@ -8,7 +8,7 @@ var match = require('./match.js');
 /// Setup DB
 ///
 mongoose.Promise = global.Promise;
-var connection = mongoose.connect('mongodb://localhost:27017/BomberBoy',
+var connection = mongoose.connect(process.env.DB ||'mongodb://localhost:27017/BomberBoy'),
 {
 	useMongoClient: true,	
 	socketTimeoutMS: 20000,
