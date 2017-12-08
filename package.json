@@ -2,10 +2,10 @@
   "name": "bomberboyapi",
   "version": "0.1.0",
   "description": "A RESTful API intended for usage with BomberBoy",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
-    "start": "node index",
-    "start-d": "nodemon index.js --exec babel-node -e js",
+    "start": "node app",
+    "start-d": "nodemon app.js --exec babel-node -e js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
