@@ -201,3 +201,51 @@ dataReadyCalls.push(function()
 	});
 
 });
+
+
+//
+// Setup query input fields
+//
+$(document).ready(function()
+{
+	var $fromDateInput = $("#from-date");
+	var $toDateInput = $("#to-date");
+	var $queryButton = $("#query-btn");
+	
+	var dateOptions = 
+	{
+		format: "dd MM yyyy",
+		todayHighlight: true,
+		autoclose: true
+	};
+	$fromDateInput.datepicker(dateOptions);
+	$toDateInput.datepicker(dateOptions);
+	
+	// Update leaderboard
+	$queryButton.click(function()
+	{
+		var startDate = Date.parse($fromDateInput.val());
+		var endDate = Date.parse($toDateInput.val());
+		
+		if(startDate == NaN)
+			startDate = 0;
+		if(endDate == NaN)
+			startDate = Date.now();
+		
+		// Make sure end date is greater than start date
+		if(endDate < startDate)
+		{
+			endDate = Date.now();
+			$toDateInput.val("");
+		}
+		
+		// Query for date range
+		var rawPlayerData = ExecuteLeaderboardQuery(
+		function(match)
+		{ 
+			return match.startTime >= startDate && match.endTime <= endDate;
+		}, 
+		function(userId, stats){ return true });
+	});
+	
+});

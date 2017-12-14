@@ -45,3 +45,8 @@
 	width: 60px;
 	image-rendering: pixelated;
 }
+
+.lb-search-btn
+{
+	color:#777;	
+}
