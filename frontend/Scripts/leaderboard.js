@@ -102,7 +102,7 @@ function ExecuteLeaderboardQuery(matchValidator, playerValidator)
 			for(var userId in match.playerStats)
 			{
 				var stats = match.playerStats[userId];
-				if(!matchValidator(userId, stats))
+				if(!playerValidator(userId, stats))
 					continue;
 				
 				// Format the data into leaderboard format
@@ -227,10 +227,11 @@ $(document).ready(function()
 		var startDate = Date.parse($fromDateInput.val());
 		var endDate = Date.parse($toDateInput.val());
 		
-		if(startDate == NaN)
+		if(isNaN(startDate))
 			startDate = 0;
-		if(endDate == NaN)
-			startDate = Date.now();
+		if(isNaN(endDate))
+			endDate = Date.now();
+		
 		
 		// Make sure end date is greater than start date
 		if(endDate < startDate)
@@ -239,11 +240,12 @@ $(document).ready(function()
 			$toDateInput.val("");
 		}
 		
+			
 		// Query for date range
 		var rawPlayerData = ExecuteLeaderboardQuery(
 		function(match)
 		{ 
-			return match.startTime >= startDate && match.endTime <= endDate;
+			return Date.parse(match.endTime) >= startDate && Date.parse(match.endTime) <= endDate;
 		}, 
 		function(userId, stats){ return true });
 	});
